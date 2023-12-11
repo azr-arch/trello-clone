@@ -58,14 +58,12 @@ export const CardForm = forwardRef<HTMLTextAreaElement, CardFormProps>(
             const listId = formData.get("listId") as string;
             const boardId = params.boardId as string;
 
-            console.log({ title, boardId, listId });
-
             execute({ title, boardId, listId });
         };
 
         if (isEditing) {
             return (
-                <form action={onSubmit} className="m-1 py-0.5 space-y-4 px-1">
+                <form action={onSubmit} ref={formRef} className="m-1 py-0.5 space-y-4 px-1">
                     <FormTextArea
                         id="title"
                         onKeyDown={onTextareakeyDown}
