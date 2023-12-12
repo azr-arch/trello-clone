@@ -7,6 +7,8 @@ import { revalidatePath } from "next/cache";
 import { createSafeAction } from "@/lib/create-safe-action";
 import { DeleteList } from "./schema";
 import { redirect } from "next/navigation";
+import { createAuditLog } from "@/lib/create-audit-log";
+import { ACTION, ENTITY_TYPE } from "@prisma/client";
 
 const handler = async (data: InputType): Promise<ReturnType> => {
     const { userId, orgId } = auth();
@@ -21,7 +23,7 @@ const handler = async (data: InputType): Promise<ReturnType> => {
     let list;
 
     try {
-        await db.list.delete({
+        list = await db.list.delete({
             where: {
                 id,
                 boardId,
@@ -29,6 +31,13 @@ const handler = async (data: InputType): Promise<ReturnType> => {
                     orgId,
                 },
             },
+        });
+
+        await createAuditLog({
+            entityId: list.id,
+            entityTitle: list.title,
+            entityType: ENTITY_TYPE.LIST,
+            action: ACTION.DELETE,
         });
     } catch (error) {
         return {
